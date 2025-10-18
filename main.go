@@ -12,7 +12,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	switchbot "github.com/nasa9084/go-switchbot/v5"
+	switchbot "github.com/riscurred/go-switchbot/v5"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -170,6 +170,7 @@ func (h *Handler) Discover(w http.ResponseWriter, r *http.Request) {
 
 	supportedDeviceTypes := map[switchbot.PhysicalDeviceType]struct{}{
 		switchbot.Hub2:        {},
+		switchbot.Hub3:		   {},
 		switchbot.Humidifier:  {},
 		switchbot.Meter:       {},
 		switchbot.MeterPlus:   {},
