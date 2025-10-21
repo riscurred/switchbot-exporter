@@ -281,7 +281,7 @@ func (h *Handler) Metrics(w http.ResponseWriter, r *http.Request) {
 		log.Printf("got device status: %s", target)
 
 		switch status.Type {
-		case switchbot.Meter, switchbot.MeterPlus, switchbot.MeterPro, switchbot.Hub2, switchbot.WoIOSensor, switchbot.Humidifier:
+		case switchbot.Meter, switchbot.MeterPlus, switchbot.MeterPro, switchbot.Hub3, switchbot.Hub2, switchbot.WoIOSensor, switchbot.Humidifier:
 			log.Printf("device is a meter-ish device")
 
 			meterHumidity.WithLabelValues(status.ID).Set(float64(status.Humidity))
