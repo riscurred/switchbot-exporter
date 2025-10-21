@@ -12,7 +12,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	switchbot "github.com/riscurred/go-switchbot/v5"
+	switchbot "github.com/riscurred/go-switchbot"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )

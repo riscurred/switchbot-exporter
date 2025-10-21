@@ -1,6 +1,6 @@
 [Unit]
 Description=switchbot-exporter
-Documentation=https://github.com/nasa9084/switchbot-exporter#readme
+Documentation=https://github.com/riscurred/switchbot-exporter#readme
 
 [Service]
 Restart=on-failure
