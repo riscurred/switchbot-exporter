@@ -12,9 +12,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	switchbot "github.com/riscurred/go-switchbot"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	switchbot "github.com/riscurred/go-switchbot"
 )
 
 var (
@@ -170,7 +170,7 @@ func (h *Handler) Discover(w http.ResponseWriter, r *http.Request) {
 
 	supportedDeviceTypes := map[switchbot.PhysicalDeviceType]struct{}{
 		switchbot.Hub2:        {},
-		switchbot.Hub3:		   {},
+		switchbot.Hub3:        {},
 		switchbot.Humidifier:  {},
 		switchbot.Meter:       {},
 		switchbot.MeterPlus:   {},
@@ -243,6 +243,13 @@ func (h *Handler) Metrics(w http.ResponseWriter, r *http.Request) {
 		Subsystem: "meter",
 		Name:      "temperature",
 	}, []string{"device_id"})
+
+	meterLightLevel := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "switchbot",
+		Subsystem: "meter",
+		Name:      "lightLevel",
+	}, []string{"device_id"})
+
 	meterCO2 := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "switchbot",
 		Subsystem: "meter",
@@ -266,7 +273,7 @@ func (h *Handler) Metrics(w http.ResponseWriter, r *http.Request) {
 		Name:      "electricCurrent",
 	}, []string{"device_id"})
 
-	registry.MustRegister(meterHumidity, meterTemperature, meterCO2)
+	registry.MustRegister(meterHumidity, meterTemperature, meterLightLevel, meterCO2)
 	registry.MustRegister(plugWeight, plugVoltage, plugElectricCurrent)
 
 	log.Printf("will try to retrieve metrics for %d devices", len(targets))
@@ -281,11 +288,20 @@ func (h *Handler) Metrics(w http.ResponseWriter, r *http.Request) {
 		log.Printf("got device status: %s", target)
 
 		switch status.Type {
-		case switchbot.Meter, switchbot.MeterPlus, switchbot.MeterPro, switchbot.Hub3, switchbot.Hub2, switchbot.WoIOSensor, switchbot.Humidifier:
+
+		case switchbot.Meter, switchbot.MeterPlus, switchbot.MeterPro, switchbot.Hub2, switchbot.WoIOSensor, switchbot.Humidifier:
 			log.Printf("device is a meter-ish device")
 
 			meterHumidity.WithLabelValues(status.ID).Set(float64(status.Humidity))
 			meterTemperature.WithLabelValues(status.ID).Set(status.Temperature)
+
+		case switchbot.Hub3:
+			log.Printf("device is a Hub 3 (with light level sensor)")
+
+			meterHumidity.WithLabelValues(status.ID).Set(float64(status.Humidity))
+			meterTemperature.WithLabelValues(status.ID).Set(status.Temperature)
+			meterLightLevel.WithLabelValues(status.ID).Set(float64(status.LightLevel))
+
 		case switchbot.MeterProCO2:
 			log.Print("device is a CO2 meter")
 
